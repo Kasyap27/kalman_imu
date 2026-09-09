@@ -71,6 +71,11 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Editor / devcontainer / vendored reference
+.vscode/
+.devcontainer/
+ICM-20948-master/
+
 # User-specific configuration files
 *.user
 *.workspace # General workspace files, can be from various tools
