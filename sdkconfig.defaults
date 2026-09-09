@@ -1,0 +1,23 @@
+# FreeRTOS tick rate: default 100Hz (10ms resolution) can't represent the
+# attitude EKF's 5ms (200Hz) loop period -- pdMS_TO_TICKS(5) rounds down to
+# 0 ticks at 100Hz, which asserts inside vTaskDelayUntil. 1000Hz gives 1ms
+# resolution, comfortably supporting the current loop and headroom if it's
+# ever pushed faster. sdkconfig itself is gitignored/generated, so this is
+# the durable place for the setting -- it only takes effect on a fresh
+# sdkconfig (delete sdkconfig and reconfigure, or `idf.py fullclean`).
+CONFIG_FREERTOS_HZ=1000
+
+# Console UART baud: 115200 can't carry a 63-byte telemetry packet at the
+# 200Hz filter rate (needs ~126kbps) plus ESP_LOG text on the same wire --
+# the firmware's telemetry queue drops samples it can't send in time, which
+# shows up as laggy/bursty data on the live plot even though the filter
+# loop itself is keeping up. 921600 gives ~8x the headroom.
+CONFIG_ESP_CONSOLE_UART_CUSTOM=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=921600
+
+# Secondary console mirror (USB-Serial-JTAG) is disabled: every stdout write
+# (telemetry packets + ESP_LOG) was being duplicated to that interface too,
+# and with nothing reading it, its buffer periodically backed up and
+# stalled the shared stdio lock -- observed as periodic ~1-packet drops
+# and briefly slower loop iterations every ~35ms on the primary UART.
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y

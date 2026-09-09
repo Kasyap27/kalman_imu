@@ -1,0 +1,25 @@
+menu "Kalman IMU Application"
+
+    choice APP_MODE
+        prompt "Application mode"
+        default APP_MODE_NORMAL
+        help
+            Normal mode runs the full sensor + attitude EKF pipeline and
+            streams filter telemetry (see py_scripts/imu_live_plot.py).
+
+            Mag calibration mode skips the EKF entirely -- it just brings up
+            the ICM-20948/AK09916 over I2C and streams raw magnetometer
+            samples as plain text, for offline hard/soft-iron calibration
+            (wave the board in a figure-8 while it's connected, capture the
+            stream, compute bias/scale, then hardcode the result back into
+            the normal-mode mag conversion in main.c).
+
+    config APP_MODE_NORMAL
+        bool "Normal (attitude EKF + telemetry)"
+
+    config APP_MODE_MAG_CALIBRATION
+        bool "Magnetometer calibration (stream raw mag data only)"
+
+    endchoice
+
+endmenu
